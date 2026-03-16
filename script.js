@@ -1,48 +1,45 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Typing Logic
+    const typingSpan = document.getElementById('typing');
+    const texts = ["Software Developer", "Full Stack Developer", "Problem Solver", "Tech Enthusiast"];
+    let textIdx = 0;
+    let charIdx = 0;
+    let isDeleting = false;
 
-// Create animated particles
-function createParticles() {
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 15 + 's';
-        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        particlesContainer.appendChild(particle);
-    }
-}
+    function type() {
+        const fullText = texts[textIdx];
+        typingSpan.textContent = isDeleting 
+            ? fullText.substring(0, charIdx--) 
+            : fullText.substring(0, charIdx++);
 
-// Update scroll progress bar
-function updateProgressBar() {
-    const progressBar = document.getElementById('progressBar');
-    const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    const scrolled = (window.scrollY / windowHeight) * 100;
-    progressBar.style.width = scrolled + '%';
-}
-
-// Initialize
-window.addEventListener('load', () => {
-    createParticles();
-    updateProgressBar();
-});
-
-window.addEventListener('scroll', updateProgressBar);
-
-// Add intersection observer for scroll animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+        if (!isDeleting && charIdx > fullText.length) {
+            isDeleting = true;
+            setTimeout(type, 1500);
+        } else if (isDeleting && charIdx < 0) {
+            isDeleting = false;
+            textIdx = (textIdx + 1) % texts.length;
+            setTimeout(type, 500);
+        } else {
+            setTimeout(type, isDeleting ? 40 : 100);
         }
-    });
-}, observerOptions);
+    }
+    type();
 
-document.querySelectorAll('.section').forEach(section => {
-    observer.observe(section);
+    // 2. Cursor Follower
+    const cursor = document.querySelector('.cursor');
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+    });
+
+    // 3. Scroll Reveal Observer
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 });
