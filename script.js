@@ -6,7 +6,7 @@ const texts = [
 "Software Developer",
 "Full Stack Developer",
 "Problem Solver",
-"Tech Enthusiast"
+"AI/ML Learner"
 ]
 
 let textIndex = 0
